@@ -1,70 +1,105 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useEffect } from 'react';
+import { SafeAreaView, StyleSheet, TextInput, Text, View, Button, Alert } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 
-export default function HomeScreen() {
+// ... other imports
+
+
+function DetailsScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Details Screen</Text>
+    </View>
+  );
+}
+
+const TextInputExample = ({ navigation }) => {
+  const [text, onChangeText] = React.useState('');
+  const [isPhoneNumberValid, setIsPhoneNumberValid] = React.useState(false);
+
+  useEffect(() => {
+    if (isPhoneNumberValid) {
+      Alert.alert("Số điện thoại hợp lệ.");
+      navigation.navigate('Details');
+    }
+  }, [isPhoneNumberValid]);
+
+  const validatePhoneNumber = (number)=> {
+    const phoneNumberRegex = /^(03|05|07|08|09|01[2689])+([0-9]{8})\b/;
+    return phoneNumberRegex.test(number);
+  };
+
+  const handlePress = () => {
+    if (validatePhoneNumber(text)) {
+      setIsPhoneNumberValid(true);
+    } else {
+      Alert.alert("Không đúng định dạng! Nhập lại");
+      onChangeText(''); // Clear the TextInput
+      setIsPhoneNumberValid(false);
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View>
+        <Text style={styles.boldText}>Please input your phone number</Text>
+        <View style={styles.spacer} />
+        <Text>Use your phone number to sign in</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={onChangeText}
+          value={text}
+          keyboardType="phone-pad"
+          placeholder="Input your phone number"
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <Button title="Tiếp tục" onPress={handlePress} />
+      </View>
+    </SafeAreaView>
+  );
+};
+
+const Stack = createNativeStackNavigator();
+
+function App() {
+  return (
+    <NavigationContainer independent={true}>
+      <Stack.Navigator initialRouteName="SignIn">
+        <Stack.Screen name="Details" component={DetailsScreen} />
+        <Stack.Screen name="SignIn" component={TextInputExample} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  safeArea: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    backgroundColor: '#F5FCFF',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  boldText: {
+    fontWeight: 'bold',
+    fontSize: 30,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  spacer: {
+    height: 10,
+  },
+  input: {
+    height: 40,
+    margin: 12,
+  },
+  TextInput:{
+    color: '#000000',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  boldPlaceholder: {
+    fontWeight: 'bold',
+    color: '#000000', 
   },
 });
+
+export default App;
